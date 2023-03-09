@@ -1,0 +1,1 @@
+03-08-23 13:42:start training cifar10_resnet_38
