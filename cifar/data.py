@@ -25,8 +25,10 @@ def prepare_train_data(dataset='cifar10', batch_size=128,
                                  (0.2023, 0.1994, 0.2010)),
         ])
 
+        # trainset = torchvision.datasets.__dict__[dataset.upper()](
+        #     root='/tmp/data', train=True, download=True, transform=transform_train)
         trainset = torchvision.datasets.__dict__[dataset.upper()](
-            root='/tmp/data', train=True, download=True, transform=transform_train)
+            root='/data/one/cml', train=True, download=True, transform=transform_train)
         train_loader = torch.utils.data.DataLoader(trainset,
                                                    batch_size=batch_size,
                                                    shuffle=shuffle,
@@ -38,7 +40,7 @@ def prepare_train_data(dataset='cifar10', batch_size=128,
                                          (0.1980, 0.2010, 0.1970)),
                 ])
         trainset = torchvision.datasets.__dict__[dataset.upper()](
-            root='/tmp/data',
+            root='/data/one/cml',
             split='train',
             download=True,
             transform=transform_train
@@ -52,7 +54,7 @@ def prepare_train_data(dataset='cifar10', batch_size=128,
         ])
 
         extraset = torchvision.datasets.__dict__[dataset.upper()](
-            root='/tmp/data',
+            root='/data/one/cml',
             split='extra',
             download=True,
             transform = transform_extra
@@ -79,7 +81,7 @@ def prepare_test_data(dataset='cifar10', batch_size=128,
                                  (0.2023, 0.1994, 0.2010)),
         ])
 
-        testset = torchvision.datasets.__dict__[dataset.upper()](root='/tmp/data',
+        testset = torchvision.datasets.__dict__[dataset.upper()](root='/data/one/cml',
                                                train=False,
                                                download=True,
                                                transform=transform_test)
@@ -94,7 +96,7 @@ def prepare_test_data(dataset='cifar10', batch_size=128,
                                          (0.2194,  0.2266,  0.2285)),
                 ])
         testset = torchvision.datasets.__dict__[dataset.upper()](
-                                               root='/tmp/data',
+                                               root='/data/one/cml',
                                                split='test',
                                                download=True,
                                                transform=transform_test)

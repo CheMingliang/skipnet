@@ -79,6 +79,7 @@ def parse_args():
 
 
 def main():
+    os.environ["CUDA_VISIBLE_DEVICES"] = '3'
     args = parse_args()
 
     save_path = args.save_path = os.path.join(args.save_folder, args.arch)
@@ -159,7 +160,7 @@ def run_training(args):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda(async=False)
+        target = target.cuda()
         input_var = Variable(input).cuda()
         target_var = Variable(target).cuda()
 
@@ -175,8 +176,8 @@ def run_training(args):
 
         # measure accuracy and record loss
         prec1, = accuracy(output.data, target, topk=(1,))
-        losses.update(loss.data[0], input.size(0))
-        top1.update(prec1[0], input.size(0))
+        losses.update(loss.data.item(), input.size(0))
+        top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
 
         # compute gradient and do SGD step
@@ -244,7 +245,7 @@ def validate(args, test_loader, model, criterion):
     model.eval()
     end = time.time()
     for i, (input, target) in enumerate(test_loader):
-        target = target.cuda(async=True)
+        target = target.cuda()
         input_var = Variable(input, volatile=True).cuda()
         target_var = Variable(target, volatile=True).cuda()
         # compute output
@@ -256,9 +257,9 @@ def validate(args, test_loader, model, criterion):
 
         # measure accuracy and record loss
         prec1, = accuracy(output.data, target, topk=(1,))
-        top1.update(prec1[0], input.size(0))
+        top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
-        losses.update(loss.data[0], input.size(0))
+        losses.update(loss.data.item(), input.size(0))
         batch_time.update(time.time() - end)
         end = time.time()
 

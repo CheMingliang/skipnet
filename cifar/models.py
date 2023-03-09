@@ -207,8 +207,8 @@ class FeedforwardGateI(nn.Module):
 
         x = self.avg_layer(x)
         x = self.linear_layer(x).squeeze()
-        softmax = self.prob_layer(x)
-        logprob = self.logprob(x)
+        softmax = self.prob_layer(x,dim=1)
+        logprob = self.logprob(x,dim=1)
 
         # discretize output in forward pass.
         # use softmax gradients in backward pass

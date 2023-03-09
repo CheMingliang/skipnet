@@ -1,1 +1,2 @@
-03-08-23 13:42:start training cifar10_resnet_38
+03-09-23 13:38:start training cifar10_resnet_38
+03-09-23 13:38:Iter [0] learning rate = 0.1
