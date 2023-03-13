@@ -192,8 +192,8 @@ class FeedforwardGateI(nn.Module):
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax()
-        self.logprob = nn.LogSoftmax()
+        self.prob_layer = nn.Softmax(dim=1)
+        self.logprob = nn.LogSoftmax(dim=1)
 
     def forward(self, x):
         x = self.maxpool(x)
@@ -207,14 +207,12 @@ class FeedforwardGateI(nn.Module):
 
         x = self.avg_layer(x)
         x = self.linear_layer(x).squeeze()
-        softmax = self.prob_layer(x,dim=1)
-        logprob = self.logprob(x,dim=1)
-
+        softmax = self.prob_layer(x)
+        logprob = self.logprob(x)
         # discretize output in forward pass.
         # use softmax gradients in backward pass
         x = (softmax[:, 1] > 0.5).float().detach() - \
             softmax[:, 1].detach() + softmax[:, 1]
-
         x = x.view(x.size(0), 1, 1, 1)
         return x, logprob
 
@@ -301,7 +299,7 @@ class FeedforwardGateII(nn.Module):
         softmax = self.prob_layer(x)
         logprob = self.logprob(x)
 
-        # discretize
+        # discretize 离散化
         x = (softmax[:, 1] > 0.5).float().detach() - \
             softmax[:, 1].detach() + softmax[:, 1]
 
@@ -453,7 +451,10 @@ class ResNetFeedForwardSP(nn.Module):
         gprobs.append(gprob)
         masks.append(mask.squeeze())
         prev = x  # input of next layer
-
+        num=0
+        for i in mask.squeeze():
+            num+=i
+        print('-------',num)
         for g in range(3):
             for i in range(0 + int(g == 0), self.num_layers[g]):
                 if getattr(self, 'group{}_ds{}'.format(g+1, i)) is not None:
