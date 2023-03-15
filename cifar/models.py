@@ -212,7 +212,7 @@ class FeedforwardGateI(nn.Module):
         # discretize output in forward pass.
         # use softmax gradients in backward pass
         x = (softmax[:, 1] > 0.5).float().detach() - \
-            softmax[:, 1].detach() + softmax[:, 1]
+            softmax[:, 1].detach() + softmax[:, 1]      # 离散化 但仍保留梯度
         x = x.view(x.size(0), 1, 1, 1)
         return x, logprob
 
@@ -563,6 +563,7 @@ class RNNGate(nn.Module):
     def forward(self, x):
         # Take the convolution output of each step
         batch_size = x.size(0)
+        # 提高内存利用率和效率 将参数放在一个块中
         self.rnn.flatten_parameters()
         out, self.hidden = self.rnn(x.view(1, batch_size, -1), self.hidden)
 
@@ -1317,5 +1318,3 @@ def cifar100_rnn_gate_rl_110(pretrained=False, **kwargs):
     model = ResNetRecurrentGateRL(BasicBlock, [18, 18, 18], num_classes=100,
                                   embed_dim=10, hidden_dim=10)
     return model
-
-

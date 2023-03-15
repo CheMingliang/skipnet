@@ -1,0 +1,2 @@
+03-15-23 18:43:start training cifar10_rnn_gate_38
+03-15-23 18:43:Iter [0] learning rate = 0.1
