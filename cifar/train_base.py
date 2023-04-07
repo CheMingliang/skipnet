@@ -71,7 +71,7 @@ def parse_args():
 
 def main():
     # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-    os.environ["CUDA_VISIBLE_DEVICES"] = '2'
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     args = parse_args()
     save_path = args.save_path = os.path.join(args.save_folder, args.arch)
     if not os.path.exists(save_path):

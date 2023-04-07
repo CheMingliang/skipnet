@@ -2,5 +2,4 @@
 .gitignore
 .idea/
 /cifar/__pycache__/
-/skipnet/cifar/save_checkpoints/
 /cifar/save_checkpoints/
