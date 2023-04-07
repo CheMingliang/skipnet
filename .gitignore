@@ -1,5 +1,4 @@
 # Created by .ignore support plugin (hsz.mobi)
 .gitignore
 .idea/
-cifar/__pycache__/data.cpython-39.pyc
-cifar/__pycache__/models.cpython-39.pyc
+cifar/__pycache__/

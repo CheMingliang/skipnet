@@ -71,7 +71,7 @@ def parse_args():
 
 def main():
     # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+    os.environ["CUDA_VISIBLE_DEVICES"] = '2'
     args = parse_args()
     save_path = args.save_path = os.path.join(args.save_folder, args.arch)
     if not os.path.exists(save_path):
@@ -141,6 +141,7 @@ def run_training(args):
     top1 = AverageMeter()
 
     end = time.time()
+    
     for i in range(args.start_iter, args.iters):
         model.train()
         adjust_learning_rate(args, optimizer, i)
@@ -152,7 +153,6 @@ def run_training(args):
         target = target.squeeze().long().cuda()
         input_var = Variable(input)
         target_var = Variable(target)
-
         # compute output
         output = model(input_var)
         loss = criterion(output, target_var)
@@ -214,13 +214,20 @@ def validate(args, test_loader, model, criterion):
     # switch to evaluation mode
     model.eval()
     end = time.time()
+    ans=[0]*10
     for i, (input, target) in enumerate(test_loader):
+        tmp=target
         target = target.squeeze().long().cuda()
         input_var = Variable(input, volatile=True)
         target_var = Variable(target, volatile=True)
 
         # compute output
         output = model(input_var)
+        # print(output.shape)
+        t1=torch.argmax(output,dim=1)
+        for i in range(t1.shape[0]):
+            if t1[i]!=tmp[i]:
+                ans[t1[i]]+=1
         loss = criterion(output, target_var)
 
         # measure accuracy and record loss
@@ -240,7 +247,7 @@ def validate(args, test_loader, model, criterion):
                     loss=losses, top1=top1
                 )
             )
-
+    print(ans)
     logging.info(' * Prec@1 {top1.avg:.3f}'.format(top1=top1))
     return top1.avg
 
