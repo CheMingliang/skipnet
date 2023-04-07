@@ -1,4 +1,0 @@
-04-06-23 13:13:start evaluating cifar10_resnet_152 with checkpoints from ./save_checkpoints/cifar10_resnet_152/model_best.pth.tar
-04-06-23 13:13:=> loading checkpoint `./save_checkpoints/cifar10_resnet_152/model_best.pth.tar`
-04-06-23 13:13:=> loaded checkpoint `./save_checkpoints/cifar10_resnet_152/model_best.pth.tar` (iter: 56000)
-04-06-23 13:13: * Prec@1 93.780

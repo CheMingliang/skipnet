@@ -53,7 +53,7 @@ def parse_args():
                         help='dataset type')
     parser.add_argument('--workers', default=1, type=int, metavar='N',
                         help='number of data loading workers (default: 4 )')
-    parser.add_argument('--iters', default=10000, type=int,
+    parser.add_argument('--iters', default=4000, type=int,
                         help='number of total iterations '
                              '(previous default: 64,000)')
     parser.add_argument('--start-iter', default=0, type=int,
@@ -209,7 +209,7 @@ def run_training(args, tune_config={}, reporter=None):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda(async=False)
+        target = target.cuda()
         input_var = Variable(input).cuda()
         target_var = Variable(target).cuda()
 
@@ -326,7 +326,7 @@ def validate(args, test_loader, model):
     model.eval()
     end = time.time()
     for i, (input, target) in enumerate(test_loader):
-        target = target.cuda(async=True)
+        target = target.cuda()
         input_var = Variable(input, volatile=True).cuda()
         target_var = Variable(target, volatile=True).cuda()
 

@@ -43,7 +43,7 @@ def parse_args():
                         help='dataset type')
     parser.add_argument('--workers', default=1, type=int, metavar='N',
                         help='number of data loading workers (default: 4 )')
-    parser.add_argument('--iters', default=64000, type=int,
+    parser.add_argument('--iters', default=4000, type=int,
                         help='number of total iterations (default: 64,000)')
     parser.add_argument('--start-iter', default=0, type=int,
                         help='manual iter number (useful on restarts)')
