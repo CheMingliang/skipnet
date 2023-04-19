@@ -1135,8 +1135,14 @@ class RNNGatePolicy(nn.Module):
             proj = self.proj(out.squeeze())
             prob = self.prob(proj)
             bi_prob = torch.cat([1 - prob, prob], dim=1)
-            action = bi_prob.multinomial()
-            self.saved_actions.append(action)
+            m = torch.distributions.Categorical(bi_prob)
+            # action = m.sample()
+            self.saved_actions.append(m)
+            # proj = self.proj(out.squeeze())
+            # prob = self.prob(proj)
+            # bi_prob = torch.cat([1 - prob, prob], dim=1)
+            # action = bi_prob.multinomial()
+            # self.saved_actions.append(action)
         else:
             proj = self.proj(out.squeeze())
             prob = self.prob(proj)
@@ -1172,7 +1178,7 @@ class ResNetRecurrentGateRL(nn.Module):
         self.avgpool = nn.AvgPool2d(8)
         self.fc = nn.Linear(64 * block.expansion, num_classes)
 
-        self.softmax = nn.Softmax()
+        self.softmax = nn.Softmax(dim=1)
 
         self.saved_actions = []
         self.rewards = []
@@ -1265,9 +1271,16 @@ class ResNetRecurrentGateRL(nn.Module):
         x = x.view(x.size(0), -1)
 
         if self.training:
+
+
             x = self.fc(x)
             softmax = self.softmax(x)
-            pred = softmax.multinomial()
+            pred = torch.distributions.Categorical(softmax)
+            # pred = m.sample()
+
+            # x = self.fc(x)
+            # softmax = self.softmax(x)
+            # pred = softmax.multinomial()
         else:
             x = self.fc(x)
             pred = x.max(1)[1]

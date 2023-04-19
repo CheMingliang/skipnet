@@ -17,6 +17,10 @@ import logging
 import models
 from data import *
 
+from thop import profile
+# 增加可读性
+from thop import clever_format
+
 
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith('__')
@@ -38,7 +42,7 @@ def parse_args():
                         help='dataset choice')
     parser.add_argument('--workers', default=8, type=int, metavar='N',
                         help='number of data loading workers (default: 4 )')
-    parser.add_argument('--iters', default=4000, type=int,
+    parser.add_argument('--iters', default=64000, type=int,
                         help='number of total iterations (default: 64,000)')
     parser.add_argument('--start-iter', default=0, type=int,
                         help='manual iter number (useful on restarts)')
@@ -99,7 +103,20 @@ def main():
 def run_training(args):
     # create model
     model = models.__dict__[args.arch](args.pretrained)
+
+    #     # 可替换为自己的模型及输入
+    # input = torch.randn(1, 3, 32, 32)
+    # flops, params = profile(model, inputs=(input, ))
+    # flops, params = clever_format([flops, params], "%.3f")
+
+    # print(flops)
+    # print(params)
+
+    # exit()
+
     model = torch.nn.DataParallel(model).cuda()
+    
+
 
     best_prec1 = 0
 
@@ -141,6 +158,8 @@ def run_training(args):
     top1 = AverageMeter()
 
     end = time.time()
+
+
     
     for i in range(args.start_iter, args.iters):
         model.train()
@@ -150,9 +169,16 @@ def run_training(args):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.squeeze().long().cuda()
-        input_var = Variable(input)
-        target_var = Variable(target)
+        target = target.cuda()
+        input_var = Variable(input).cuda()
+        # print(input_var.shape)
+        target_var = Variable(target).cuda()
+        print(input_var.shape)
+
+        # target = target.squeeze().long().cuda()
+        # input_var = Variable(input)
+        # target_var = Variable(target)
+
         # compute output
         output = model(input_var)
         loss = criterion(output, target_var)
@@ -214,12 +240,13 @@ def validate(args, test_loader, model, criterion):
     # switch to evaluation mode
     model.eval()
     end = time.time()
-    ans=[0]*10
+    ans=[0]*100
     for i, (input, target) in enumerate(test_loader):
         tmp=target
         target = target.squeeze().long().cuda()
-        input_var = Variable(input, volatile=True)
-        target_var = Variable(target, volatile=True)
+        with torch.no_grad():
+            input_var = Variable(input)
+            target_var = Variable(target)
 
         # compute output
         output = model(input_var)

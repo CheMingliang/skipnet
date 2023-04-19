@@ -43,7 +43,7 @@ def parse_args():
                         help='dataset type')
     parser.add_argument('--workers', default=1, type=int, metavar='N',
                         help='number of data loading workers (default: 4 )')
-    parser.add_argument('--iters', default=4000, type=int,
+    parser.add_argument('--iters', default=64000, type=int,
                         help='number of total iterations (default: 64,000)')
     parser.add_argument('--start-iter', default=0, type=int,
                         help='manual iter number (useful on restarts)')
@@ -55,7 +55,7 @@ def parse_args():
                         help='momentum')
     parser.add_argument('--weight-decay', default=1e-4, type=float,
                         help='weight decay (default: 1e-4)')
-    parser.add_argument('--print-freq', default=10, type=int,
+    parser.add_argument('--print-freq', default=100, type=int,
                         help='print frequency (default: 10)')
     parser.add_argument('--resume', default='', type=str,
                         help='path to  latest checkpoint (default: None)')
@@ -206,14 +206,14 @@ def run_training(args):
                             loss=losses,
                             top1=top1)
             )
-            for idx in range(skip_ratios.len):
-                logging.info(
-                    "{} layer skipping = {:.3f}({:.3f})".format(
-                        idx,
-                        skip_ratios.val[idx],
-                        skip_ratios.avg[idx],
-                    )
-                )
+            # for idx in range(skip_ratios.len):
+            #     logging.info(
+            #         "{} layer skipping = {:.3f}({:.3f})".format(
+            #             idx,
+            #             skip_ratios.val[idx],
+            #             skip_ratios.avg[idx],
+            #         )
+            #     )
 
         # evaluate every 1000 steps
         if (i % args.eval_every == 0 and i > 0) or (i == (args.iters-1)):

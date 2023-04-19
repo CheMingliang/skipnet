@@ -29,7 +29,7 @@ class BatchCrossEntropy(nn.Module):
         super(BatchCrossEntropy, self).__init__()
 
     def forward(self, x, target):
-        logp = F.log_softmax(x)
+        logp = F.log_softmax(x,dim=1)
         target = target.view(-1,1)
         output = - logp.gather(1, target)
         return output
@@ -53,7 +53,7 @@ def parse_args():
                         help='dataset type')
     parser.add_argument('--workers', default=1, type=int, metavar='N',
                         help='number of data loading workers (default: 4 )')
-    parser.add_argument('--iters', default=4000, type=int,
+    parser.add_argument('--iters', default=10000, type=int,
                         help='number of total iterations '
                              '(previous default: 64,000)')
     parser.add_argument('--start-iter', default=0, type=int,
@@ -66,7 +66,7 @@ def parse_args():
                         help='momentum')
     parser.add_argument('--weight-decay', default=1e-4, type=float,
                         help='weight decay (default: 1e-4)')
-    parser.add_argument('--print-freq', default=10, type=int,
+    parser.add_argument('--print-freq', default=100, type=int,
                         help='print frequency (default: 10)')
     parser.add_argument('--resume', default='', type=str,
                         help='path to  latest checkpoint (default: None)')
@@ -80,7 +80,7 @@ def parse_args():
     parser.add_argument('--save-folder', default='save_checkpoints',
                         type=str,
                         help='folder to save the checkpoints')
-    parser.add_argument('--eval-every', default=200, type=int,
+    parser.add_argument('--eval-every', default=500, type=int,
                         help='evaluate model every (default: 200) iterations')
     parser.add_argument('--fine_tune', action='store_true',
                         help='fine tune model')
@@ -102,6 +102,7 @@ def parse_args():
 
 
 def main():
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     args = parse_args()
     save_path = args.save_path = os.path.join(args.save_folder, args.arch)
     os.makedirs(save_path, exist_ok=True)
@@ -237,8 +238,10 @@ def run_training(args, tune_config={}, reporter=None):
 
         # apply REINFORCE to each gate
         # Pytorch 2.0 version. `reinforce` function got removed in Pytorch 3.0
-        for action, R in zip(gate_saved_actions, cum_rewards):
-             action.reinforce(args.rl_weight * R)
+        for m, R in zip(gate_saved_actions, cum_rewards):
+            #  action.reinforce(args.rl_weight * R)
+            loss = -m.log_prob(m.sample())*args.rl_weight*R
+            loss.backward()
 
 
         total_loss = total_criterion(output, target_var)
